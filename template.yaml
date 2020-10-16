@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Timeout: 5
+    CodeUri: boulder-watcher/
+    Handler: app.handler
+    Runtime: python3.7
+
+Resources:
+  BoulderWeltOstWatcherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Policies: AmazonTimestreamFullAccess
+      Events:
+        TriggerEveryMinute:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+      Environment:
+        Variables:
+          BOULDER_URL: https://www.boulderwelt-muenchen-ost.de/
+          LOCATION: 'muenchen-ost'
+          TABLE_NAME: !Ref BoulderWatcherTimestreamTable
+
+  BoulderWeltWestWatcherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Policies: AmazonTimestreamFullAccess
+      Events:
+        TriggerEveryMinute:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+      Environment:
+        Variables:
+          BOULDER_URL: https://www.boulderwelt-muenchen-west.de/
+          LOCATION: 'muenchen-west'
+          TABLE_NAME: !Ref BoulderWatcherTimestreamTable
+
+  BoulderWatcherTimestreamDatabase:
+    Type: AWS::Timestream::Database
+    Properties: 
+      DatabaseName: BoulderWatcher
+
+  BoulderWatcherTimestreamTable:
+    Type: AWS::Timestream::Table
+    DependsOn: BoulderWatcherTimestreamDatabase
+    Properties: 
+      DatabaseName: BoulderWatcher
+      TableName: BoulderCrowdLevel
+      RetentionProperties:
+        MemoryStoreRetentionPeriodInHours: "168" # 1 week
+        MagneticStoreRetentionPeriodInDays: "1095"  # 3 years
