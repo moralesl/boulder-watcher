@@ -3,6 +3,9 @@ import boto3
 import time
 import requests
 import json
+from aws_lambda_powertools import Tracer
+
+tracer = Tracer(service='boulder-watcher')
 
 timestream = boto3.client('timestream-write')
 
@@ -24,6 +27,7 @@ def get_url():
     return BOULDER_URL + PATH
 
 
+@tracer.capture_method
 def get_crowd_indicator():
     response = requests.request("POST", get_url(), data=PAYLOAD)
 
@@ -44,6 +48,7 @@ def extract_crowd_level(crowd_indicator):
         crowd_indicator['percent'])
 
 
+@tracer.capture_method
 def store_crowd_level(crowd_level):
     timestream.write_records(
         DatabaseName=DATABASE_NAME,
@@ -63,6 +68,8 @@ def store_crowd_level(crowd_level):
 def current_millis_time():
         return str(int(round(time.time() * 1000)))
 
+
+@tracer.capture_lambda_handler
 def handler(event, context):
     print("Started fetching of {} at {}".format(BOULDER_URL, time.ctime()))
     crowd_indicator = get_crowd_indicator()

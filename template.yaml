@@ -7,6 +7,7 @@ Globals:
     CodeUri: boulder-watcher/
     Handler: app.handler
     Runtime: python3.7
+    Tracing: Active
 
 Resources:
   BoulderWeltOstWatcherFunction:
@@ -41,13 +42,13 @@ Resources:
 
   BoulderWatcherTimestreamDatabase:
     Type: AWS::Timestream::Database
-    Properties: 
+    Properties:
       DatabaseName: BoulderWatcher
 
   BoulderWatcherTimestreamTable:
     Type: AWS::Timestream::Table
     DependsOn: BoulderWatcherTimestreamDatabase
-    Properties: 
+    Properties:
       DatabaseName: BoulderWatcher
       TableName: BoulderCrowdLevel
       RetentionProperties:
