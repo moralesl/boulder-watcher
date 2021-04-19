@@ -1,6 +1,6 @@
 # SAM Boulder-Watcher
 
-Watches the crowd level of the BoulderWelt East and West.
+Watches the crowd level of the BoulderWelt [east](https://www.boulderwelt-muenchen-ost.de/), [south](https://www.boulderwelt-muenchen-sued.de/) and [west](https://www.boulderwelt-muenchen-west.de/).
 
 
 ## Architecture overview

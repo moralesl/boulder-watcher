@@ -25,6 +25,21 @@ Resources:
           LOCATION: 'muenchen-ost'
           TABLE_NAME: !Ref BoulderWatcherTimestreamTable
 
+  BoulderWeltSuedWatcherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Policies: AmazonTimestreamFullAccess
+      Events:
+        TriggerEveryMinute:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+      Environment:
+        Variables:
+          BOULDER_URL: https://www.boulderwelt-muenchen-sued.de/
+          LOCATION: 'muenchen-sued'
+          TABLE_NAME: !Ref BoulderWatcherTimestreamTable
+
   BoulderWeltWestWatcherFunction:
     Type: AWS::Serverless::Function
     Properties:
