@@ -7,6 +7,7 @@ Globals:
     CodeUri: boulder-watcher/
     Handler: app.handler
     Runtime: python3.7
+    AutoPublishAlias: live
     Tracing: Active
     Layers:
     - !GetAtt AwsLambdaPowertoolsPythonLayer.Outputs.LayerVersionArn
