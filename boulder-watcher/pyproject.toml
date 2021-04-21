@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "boulder-watcher"
+version = "0.1.0"
+description = ""
+authors = ["Luis Morales <lluim@amazon.de>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[tool.poetry.dev-dependencies]
+requests = "^2.25.1"
+aws-lambda-powertools = "^1.14.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
