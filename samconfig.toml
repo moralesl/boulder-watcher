@@ -6,6 +6,6 @@ stack_name = "boulder-watcher"
 s3_prefix = "boulder-watcher"
 region = "eu-west-1"
 confirm_changeset = true
-capabilities = "CAPABILITY_IAM"
+capabilities = "CAPABILITY_IAM CAPABILITY_AUTO_EXPAND"
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-i7wl77sy1xcy"
 tags = "Project=BoulderWatcher"
