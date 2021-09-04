@@ -1,0 +1,494 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 13,
+      "panels": [],
+      "title": "Auslastung",
+      "type": "row"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 6,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
+      },
+      "pluginVersion": "8.0.5",
+      "targets": [
+        {
+          "queryType": "raw",
+          "rawQuery": "SELECT measure_value::double as \"München Süd\" FROM $__database.$__table\n  WHERE time between ago(5m) and now()\n  and location = 'muenchen-sued'\n  LIMIT 1",
+          "refId": "München Süd"
+        },
+        {
+          "hide": false,
+          "queryType": "raw",
+          "rawQuery": "SELECT measure_value::double as \"München West\" FROM $__database.$__table\n  WHERE time between ago(5m) and now()\n  and location = 'muenchen-west'\n  LIMIT 1",
+          "refId": "München West"
+        },
+        {
+          "hide": false,
+          "queryType": "raw",
+          "rawQuery": "SELECT measure_value::double as \"München Ost\" FROM $__database.$__table\n  WHERE time between ago(5m) and now()\n  and location = 'muenchen-ost'\n  LIMIT 1",
+          "refId": "München Ost"
+        },
+        {
+          "hide": false,
+          "queryType": "raw",
+          "rawQuery": "SELECT measure_value::double as \"München Einstein\" FROM $__database.$__table\n  WHERE time between ago(5m) and now()\n  and location = 'muenchen-einstein'\n  LIMIT 1",
+          "refId": "München Einstein"
+        }
+      ],
+      "title": "Auslastung",
+      "type": "gauge"
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "calculation": "mean",
+            "colorPalette": "interpolateRdYlGn",
+            "colorSpace": "rgb",
+            "groupBy": 15,
+            "invertPalette": true,
+            "nullValueColor": "rgb(155, 155, 155)"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 6,
+        "x": 0,
+        "y": 7
+      },
+      "id": 8,
+      "options": {
+        "from": "7",
+        "legendGradientQuality": "high",
+        "showCellBorder": false,
+        "showLegend": true,
+        "showTooltip": true,
+        "showValueIndicator": false,
+        "timeFieldName": "time",
+        "to": "23",
+        "valueFieldName": "crowd_lvl"
+      },
+      "targets": [
+        {
+          "queryType": "raw",
+          "rawQuery": "SELECT \n  BIN(time,15m) AS time,\n  measure_value::double as crowd_lvl\nFROM $__database.$__table\n  WHERE $__timeFilter\n  and measure_name = '$__measure'\n  and location = 'muenchen-west'\ngroup by BIN(time,15m), measure_value::double\n",
+          "refId": "A"
+        }
+      ],
+      "title": "München West - Hourly heatmap",
+      "type": "marcusolsson-hourly-heatmap-panel"
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "calculation": "mean",
+            "colorPalette": "interpolateRdYlGn",
+            "colorSpace": "rgb",
+            "groupBy": 15,
+            "invertPalette": true,
+            "nullValueColor": "rgb(155, 155, 155)"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 6,
+        "x": 6,
+        "y": 7
+      },
+      "id": 14,
+      "options": {
+        "from": "7",
+        "legendGradientQuality": "high",
+        "showCellBorder": false,
+        "showLegend": true,
+        "showTooltip": true,
+        "showValueIndicator": false,
+        "timeFieldName": "time",
+        "to": "23",
+        "valueFieldName": "crowd_lvl"
+      },
+      "targets": [
+        {
+          "queryType": "raw",
+          "rawQuery": "SELECT \n  BIN(time,15m) AS time,\n  measure_value::double as crowd_lvl\nFROM $__database.$__table\n  WHERE $__timeFilter\n  and measure_name = '$__measure'\n  and location = 'muenchen-sued'\ngroup by BIN(time,15m), measure_value::double\n",
+          "refId": "A"
+        }
+      ],
+      "title": "München Süd - Hourly heatmap",
+      "type": "marcusolsson-hourly-heatmap-panel"
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "calculation": "mean",
+            "colorPalette": "interpolateRdYlGn",
+            "colorSpace": "rgb",
+            "groupBy": 15,
+            "invertPalette": true,
+            "nullValueColor": "rgb(155, 155, 155)"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 6,
+        "x": 12,
+        "y": 7
+      },
+      "id": 15,
+      "options": {
+        "from": "7",
+        "legendGradientQuality": "high",
+        "showCellBorder": false,
+        "showLegend": true,
+        "showTooltip": true,
+        "showValueIndicator": false,
+        "timeFieldName": "time",
+        "to": "23",
+        "valueFieldName": "crowd_lvl"
+      },
+      "targets": [
+        {
+          "queryType": "raw",
+          "rawQuery": "SELECT \n  BIN(time,15m) AS time,\n  measure_value::double as crowd_lvl\nFROM $__database.$__table\n  WHERE $__timeFilter\n  and measure_name = '$__measure'\n  and location = 'muenchen-einstein'\ngroup by BIN(time,15m), measure_value::double\n",
+          "refId": "A"
+        }
+      ],
+      "title": "München Einstein - Hourly heatmap",
+      "type": "marcusolsson-hourly-heatmap-panel"
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "calculation": "mean",
+            "colorPalette": "interpolateRdYlGn",
+            "colorSpace": "rgb",
+            "groupBy": 15,
+            "invertPalette": true,
+            "nullValueColor": "rgb(155, 155, 155)"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 6,
+        "x": 18,
+        "y": 7
+      },
+      "id": 16,
+      "options": {
+        "from": "7",
+        "legendGradientQuality": "high",
+        "showCellBorder": false,
+        "showLegend": true,
+        "showTooltip": true,
+        "showValueIndicator": false,
+        "timeFieldName": "time",
+        "to": "23",
+        "valueFieldName": "crowd_lvl"
+      },
+      "targets": [
+        {
+          "queryType": "raw",
+          "rawQuery": "SELECT \n  BIN(time,15m) AS time,\n  measure_value::double as crowd_lvl\nFROM $__database.$__table\n  WHERE $__timeFilter\n  and measure_name = '$__measure'\n  and location = 'muenchen-ost'\ngroup by BIN(time,15m), measure_value::double\n",
+          "refId": "A"
+        }
+      ],
+      "title": "München Ost - Hourly heatmap",
+      "type": "marcusolsson-hourly-heatmap-panel"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 2,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 2,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "crowd_lvl muenchen-sued"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "München Süd"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "queryType": "raw",
+          "rawQuery": "SELECT \n  bin(time, 1h) as binned_timestamp,\n  avg(measure_value::double) as crowd_lvl\nFROM $__database.$__table\n  WHERE $__timeFilter\n  and measure_name = '$__measure'\n  and location = 'muenchen-sued'\ngroup by bin(time, 1h)\norder by binned_timestamp asc\n",
+          "refId": "München Süd"
+        },
+        {
+          "hide": false,
+          "queryType": "raw",
+          "rawQuery": "SELECT \n  bin(time, 1h) as binned_timestamp,\n  avg(measure_value::double) as crowd_lvl\nFROM $__database.$__table\n  WHERE $__timeFilter\n  and measure_name = '$__measure'\n  and location = 'muenchen-west'\ngroup by bin(time, 1h)\norder by binned_timestamp asc\n",
+          "refId": "München West"
+        },
+        {
+          "hide": false,
+          "queryType": "raw",
+          "rawQuery": "SELECT \n  bin(time, 1h) as binned_timestamp,\n  avg(measure_value::double) as crowd_lvl\nFROM $__database.$__table\n  WHERE $__timeFilter\n  and measure_name = '$__measure'\n  and location = 'muenchen-ost'\ngroup by bin(time, 1h)\norder by binned_timestamp asc\n",
+          "refId": "München Ost"
+        },
+        {
+          "hide": false,
+          "queryType": "raw",
+          "rawQuery": "SELECT \n  bin(time, 1h) as binned_timestamp,\n  avg(measure_value::double) as crowd_lvl\nFROM $__database.$__table\n  WHERE $__timeFilter\n  and measure_name = '$__measure'\n  and location = 'muenchen-einstein'\ngroup by bin(time, 1h)\norder by binned_timestamp asc\n",
+          "refId": "München Einstein"
+        }
+      ],
+      "title": "Crowd-level of the last 7 days",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 30,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Weekly Crowd_level",
+  "uid": "9Z90wV4nk",
+  "version": 6
+}
