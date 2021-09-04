@@ -66,6 +66,24 @@ Resources:
           LOCATION: 'muenchen-west'
           TABLE_NAME: !Ref BoulderWatcherTimestreamTable
 
+  EinsteinMuenchenWatcherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Policies: AmazonTimestreamFullAccess
+      CodeUri: einstein-watcher/
+      Handler: app.handler
+      Events:
+        TriggerEveryMinute:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+      Environment:
+        Variables:
+          BOULDER_URL: https://muenchen.einstein-boulder.com/
+          LOCATION: 'muenchen-einstein'
+          TABLE_NAME: !Ref BoulderWatcherTimestreamTable
+          JWT_TOKEN: eyJhbGciOiJIUzI1NiIsICJ0eXAiOiJKV1QifQ.eyJjdXN0b21lciI6IkVpbnN0ZWluTSJ9.uH9xRoVykz5fzofHc-JGigeHreaeTayel49o3FR6cNA
+
   BoulderWatcherTimestreamDatabase:
     Type: AWS::Timestream::Database
     Properties:
