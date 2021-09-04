@@ -45,7 +45,7 @@ def get_crowd_indicator():
 
 def extract_crowd_level(crowd_indicator):
     return str(
-        crowd_indicator['percent'])
+        crowd_indicator['level'])
 
 
 @tracer.capture_method
