@@ -4,6 +4,7 @@ import boto3
 import time
 import requests
 import json
+from datetime import datetime
 from aws_lambda_powertools import Tracer
 
 tracer = Tracer(service='boulder-watcher')
@@ -69,12 +70,42 @@ def current_millis_time():
         return str(int(round(time.time() * 1000)))
 
 
+def is_after_opening_time():
+    now = datetime.now()
+    today5am = now.replace(hour=5, minute=0, second=0, microsecond=0)
+
+    is_after = today5am < now
+
+    print("Is after opening time: " + str(is_after))
+    return is_after
+
+
+def is_before_closing_time():
+    now = datetime.now()
+    today12am = now.replace(hour=23, minute=59, second=59, microsecond=0)
+
+    is_before = today12am > now
+
+    print("Is before closing time: " + str(is_before))
+    return is_before
+
+
+def is_within_opening_hours():
+    return is_after_opening_time() and is_before_closing_time()
+
+
 @tracer.capture_lambda_handler
 def handler(event, context):
-    print("Started fetching of {} at {}".format(BOULDER_URL, time.ctime()))
-    crowd_indicator = get_crowd_indicator()
+    print("Start checking crowd level")
 
-    crowd_level = extract_crowd_level(crowd_indicator)
+    if is_within_opening_hours():
+        print("Started fetching of {} at {}".format(BOULDER_URL, time.ctime()))
+        crowd_indicator = get_crowd_indicator()
+
+        crowd_level = extract_crowd_level(crowd_indicator)
+    else:
+        print("It is outside of the opening hours")
+        crowd_level = 0
+
     print("Current crowd level: {}".format(crowd_level))
-
     store_crowd_level(crowd_level)
