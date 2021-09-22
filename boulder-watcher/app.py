@@ -104,7 +104,7 @@ def handler(event, context):
         crowd_level = extract_crowd_level(crowd_indicator)
     else:
         print("It is outside of the opening hours")
-        crowd_level = 0
+        crowd_level = str(0)
 
     print("Current crowd level: {}".format(crowd_level))
     store_crowd_level(crowd_level)
