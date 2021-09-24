@@ -7,6 +7,10 @@ Watches the crowd level of the BoulderWelt [east](https://www.boulderwelt-muench
 ![BoulderWatcher Architecture](docs/BoulderWatcher.png)
 
 
+## Monitoring overview
+![BoulderWatcher Monitoring Architecture](docs/BoulderWatcher_monitoring.png)
+
+
 ## Sample boulder API request
 ```
 curl --location \
