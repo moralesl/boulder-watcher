@@ -35,7 +35,17 @@ def get_crowd_indicator():
     if response.ok:
         print("Fetched crowd indicator succesful: {}".format(
             response.text.encode('utf8')))
-        return json.loads(response.text.encode('utf8'))
+
+        payload = json.loads(response.text.encode('utf8'))
+
+        if payload['success']:
+            print("Request has been succesful")
+
+            return payload
+        else:
+            print("Request hasn't been succesful")
+
+            return None
 
     else:
         print("Request failed with: {}".format(response.status_code))
@@ -100,6 +110,9 @@ def handler(event, context):
     if is_within_opening_hours():
         print("Started fetching of {} at {}".format(BOULDER_URL, time.ctime()))
         crowd_indicator = get_crowd_indicator()
+
+        if not crowd_indicator:
+            raise ValueError('No crowd indicator available')
 
         crowd_level = extract_crowd_level(crowd_indicator)
     else:
