@@ -4,8 +4,11 @@ import time
 import requests
 import json
 from datetime import datetime
+from aws_lambda_powertools import Logger
 from aws_lambda_powertools import Tracer
 
+
+log = Logger(service=os.environ['LOCATION'], sample_rate=1, level='DEBUG')
 tracer = Tracer(service='boulder-watcher')
 
 timestream = boto3.client('timestream-write')
@@ -33,27 +36,29 @@ def get_crowd_indicator():
     response = requests.request("POST", get_url(), data=PAYLOAD)
 
     if response.ok:
-        print("Fetched crowd indicator succesful: {}".format(
+        log.info("Fetched crowd indicator succesful: {}".format(
             response.text.encode('utf8')))
 
         payload = json.loads(response.text.encode('utf8'))
 
         if payload['success']:
-            print("Request has been succesful")
+            log.debug("Request has been succesful")
 
             return payload
         else:
-            print("Request hasn't been succesful")
+            log.error("Request hasn't been succesful", payload)
 
             return None
 
     else:
-        print("Request failed with: {}".format(response.status_code))
-        print("And body: " + response.text.encode('utf8'))
+        log.error("Request failed with: {}".format(response.status_code))
+        log.error("And body: " + response.text.encode('utf8'))
 
         return None
 
 
+# Extract from payload: {"level":11,"success":true}
+# => 11
 def extract_crowd_level(crowd_indicator):
     return str(
         crowd_indicator['level'])
@@ -85,7 +90,7 @@ def is_after_opening_time():
 
     is_after = today5am < now
 
-    print("Is after opening time: " + str(is_after))
+    log.debug("Is after opening time: " + str(is_after))
     return is_after
 
 
@@ -95,7 +100,7 @@ def is_before_closing_time():
 
     is_before = today12am > now
 
-    print("Is before closing time: " + str(is_before))
+    log.debug("Is before closing time: " + str(is_before))
     return is_before
 
 
@@ -105,10 +110,10 @@ def is_within_opening_hours():
 
 @tracer.capture_lambda_handler
 def handler(event, context):
-    print("Start checking crowd level")
+    log.info("Start checking crowd level")
 
     if is_within_opening_hours():
-        print("Started fetching of {} at {}".format(BOULDER_URL, time.ctime()))
+        log.debug("Started fetching of {} at {}".format(BOULDER_URL, time.ctime()))
         crowd_indicator = get_crowd_indicator()
 
         if not crowd_indicator:
@@ -116,8 +121,9 @@ def handler(event, context):
 
         crowd_level = extract_crowd_level(crowd_indicator)
     else:
-        print("It is outside of the opening hours")
+        log.debug("It is outside of the opening hours")
         crowd_level = str(0)
 
-    print("Current crowd level: {}".format(crowd_level))
+    log.debug("Current crowd level: {}".format(crowd_level))
     store_crowd_level(crowd_level)
+    log.debug("Persisted crowd level")

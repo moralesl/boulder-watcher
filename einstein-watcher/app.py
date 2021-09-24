@@ -5,8 +5,11 @@ import time
 import requests
 import json
 from datetime import datetime
+from aws_lambda_powertools import Logger
 from aws_lambda_powertools import Tracer
 
+
+log = Logger(service=os.environ['LOCATION'], sample_rate=1, level='DEBUG')
 tracer = Tracer(service='boulder-watcher')
 
 timestream = boto3.client('timestream-write')
@@ -34,17 +37,19 @@ def get_crowd_indicator():
     response = requests.request("GET", get_url())
 
     if response.ok:
-        print("Fetched raw crowd indicator succesful: {}".format(
+        log.info("Fetched raw crowd indicator succesful: {}".format(
             response.text.encode('utf8')))
         return response.text
 
     else:
-        print("Request failed with: {}".format(response.status_code))
-        print("And body: " + response.text.encode('utf8'))
+        log.error("Request failed with: {}".format(response.status_code))
+        log.error("And body: " + response.text.encode('utf8'))
 
         return None
 
 
+# Extract from payload: \r\n\t\t\t\t\t<!DOCTYPE html>\r\n\t\t\t\t\t<html lang="de">\r\n\t\t\t\t\t <head>\r\n\t\t\t\t\t <meta charset="utf-8" />\r\n\t\t\t\t\t <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />\r\n\t\t\t\t\t\t<meta http-equiv="X-UA-Compatible" content="IE=edge">\r\n\t\t\t\t\t <link rel="stylesheet" type="text/css" href="css/public_ampel.css">\r\n\t\t\t\t<link rel="stylesheet" href="/fonts/asap.css" as="style">\r\n\t\t\t\t <title>Boulderado Counter</title>\r\n\t\t\t\t </head>\r\n\t\t\t\t <body>\r\n\t\t\t\t\t<div id="visitorcount-container" class="freepercent1 ">\r\n\t\t\t\t<div class="actcounter zoom"><div class="actcounter-content"><div class="pointer-container"><div style="position: absolute;\tleft: 24%; top: 50%; transform: translate(-24%, -50%)" class="pointer-image"></div></div></div></div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t </body>\r\n\t\t\t\t\t</html>\r\n\t\t\t\t
+# => 24
 def extract_crowd_level(crowd_indicator):
     return re.search(CROWD_LEVEL_PATTERN, crowd_indicator).group(1)
 
@@ -76,7 +81,7 @@ def is_after_opening_time():
 
     is_after = today5am < now
 
-    print("Is after opening time: " + str(is_after))
+    log.debug("Is after opening time: " + str(is_after))
     return is_after
 
 
@@ -86,7 +91,7 @@ def is_before_closing_time():
 
     is_before = today12am > now
 
-    print("Is before closing time: " + str(is_before))
+    log.debug("Is before closing time: " + str(is_before))
     return is_before
 
 
@@ -96,16 +101,17 @@ def is_within_opening_hours():
 
 @tracer.capture_lambda_handler
 def handler(event, context):
-    print("Start checking crowd level")
+    log.info("Start checking crowd level")
 
     if is_within_opening_hours():
-        print("Started fetching of {} at {}".format(BOULDER_URL, time.ctime()))
+        log.debug("Started fetching of {} at {}".format(BOULDER_URL, time.ctime()))
         crowd_indicator = get_crowd_indicator()
 
         crowd_level = extract_crowd_level(crowd_indicator)
     else:
-        print("It is outside of the opening hours")
+        log.debug("It is outside of the opening hours")
         crowd_level = str(0)
 
-    print("Current crowd level: {}".format(crowd_level))
+    log.info("Current crowd level: {}".format(crowd_level))
     store_crowd_level(crowd_level)
+    log.debug("Persisted crowd level")
