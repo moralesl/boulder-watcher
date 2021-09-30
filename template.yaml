@@ -6,7 +6,7 @@ Globals:
     Timeout: 10
     CodeUri: boulder-watcher/
     Handler: app.handler
-    Runtime: python3.7
+    Runtime: python3.9
     AutoPublishAlias: live
     Tracing: Active
     Layers:
