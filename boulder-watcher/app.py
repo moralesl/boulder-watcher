@@ -36,7 +36,7 @@ def get_crowd_indicator():
     response = requests.request("POST", get_url(), data=PAYLOAD)
 
     if response.ok:
-        log.info("Fetched crowd indicator succesful: {}".format(
+        log.debug("Fetched crowd indicator succesful: {}".format(
             response.text.encode('utf8')))
 
         payload = json.loads(response.text.encode('utf8'))
@@ -46,13 +46,13 @@ def get_crowd_indicator():
 
             return payload
         else:
-            log.error("Request hasn't been succesful", payload)
+            log.warn("Request hasn't been succesful", payload)
 
             return None
 
     else:
-        log.error("Request failed with: {}".format(response.status_code))
-        log.error("And body: " + response.text.encode('utf8'))
+        log.error("Request failed with status code {}: {}".format(
+            response.status_code, response.text.encode('utf8')))
 
         return None
 
@@ -113,10 +113,11 @@ def handler(event, context):
     log.info("Start checking crowd level")
 
     if is_within_opening_hours():
-        log.debug("Started fetching of {} at {}".format(BOULDER_URL, time.ctime()))
         crowd_indicator = get_crowd_indicator()
+        log.debug("Fetched crowd indicator of {} at {}: {}".format(BOULDER_URL, time.ctime(), crowd_indicator))
 
         if not crowd_indicator:
+            log.error("No crowd indicator available")
             raise ValueError('No crowd indicator available')
 
         crowd_level = extract_crowd_level(crowd_indicator)
@@ -124,6 +125,6 @@ def handler(event, context):
         log.debug("It is outside of the opening hours")
         crowd_level = str(0)
 
-    log.debug("Current crowd level: {}".format(crowd_level))
+    log.info("Current crowd level: {}".format(crowd_level))
     store_crowd_level(crowd_level)
     log.debug("Persisted crowd level")
