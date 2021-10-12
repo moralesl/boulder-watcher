@@ -77,9 +77,9 @@ def current_millis_time():
 
 def is_after_opening_time():
     now = datetime.now()
-    today5am = now.replace(hour=5, minute=0, second=0, microsecond=0)
+    today7am = now.replace(hour=7, minute=0, second=0, microsecond=0)
 
-    is_after = today5am < now
+    is_after = today7am < now
 
     log.debug("Is after opening time: " + str(is_after))
     return is_after
@@ -87,9 +87,9 @@ def is_after_opening_time():
 
 def is_before_closing_time():
     now = datetime.now()
-    today12am = now.replace(hour=23, minute=59, second=59, microsecond=0)
+    today10pm = now.replace(hour=22, minute=0, second=0, microsecond=0)
 
-    is_before = today12am > now
+    is_before = today10pm > now
 
     log.debug("Is before closing time: " + str(is_before))
     return is_before
