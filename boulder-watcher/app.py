@@ -1,9 +1,11 @@
 import os
+import re
 import boto3
 import time
 import requests
 import json
 from datetime import datetime
+from pyquery import PyQuery as pq
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools import Tracer
 
@@ -25,6 +27,7 @@ TABLE_NAME = timestream_environment.split('|')[1]
 
 PATH = "/wp-admin/admin-ajax.php"
 PAYLOAD = {'action': 'cxo_get_crowd_indicator'}
+CROWD_LEVEL_PATTERN = re.compile("margin-left:\s*(\d+\.?\d*)%")
 
 
 def get_url():
@@ -33,7 +36,42 @@ def get_url():
 
 @tracer.capture_method
 def get_crowd_indicator():
+    crowd_indicator = fetch_crowd_indicator_from_api()
+    if crowd_indicator:
+        log.info("Fetched crowd indicator from API: {}", crowd_indicator)
+        return extract_crowd_level_from_api(crowd_indicator)
+
+    html_body = fetch_crowd_indicator_from_html()
+    if html_body:
+        log.info("Fetched crowd indicator from HTML")
+        return extract_crowd_level_from_html(html_body)
+
+    log.error("Crowd indicator couldn't been fetched")
+    return None
+
+
+@tracer.capture_method
+def fetch_crowd_indicator_from_html():
+    return pq(url=BOULDER_URL)
+
+# Extract from payload: 'margin-left:28.3%'
+# => 28.3
+@tracer.capture_method
+def extract_crowd_level_from_html(html_body):
+    if html_body:
+        log.debug(f"HTML body: {html_body.html()}")
+        style = html_body('#cxo-crowd-indicator .crowd-level-pointer img').attr('style')
+        if style:
+            log.debug(f"Style is: {style}")
+            return re.search(CROWD_LEVEL_PATTERN, style).group(1)
+
+    log.debug("Nothing could be extracted")
+    return None
+
+@tracer.capture_method
+def fetch_crowd_indicator_from_api():
     response = requests.request("POST", get_url(), data=PAYLOAD)
+    log.debug("Request completed")
 
     if response.ok:
         log.debug("Fetched crowd indicator succesful: {}".format(
@@ -46,12 +84,12 @@ def get_crowd_indicator():
 
             return payload
         else:
-            log.warn("Request hasn't been succesful", payload)
+            log.warn("Request hasn't been succesful: {}", payload)
 
             return None
 
     else:
-        log.error("Request failed with status code {}: {}".format(
+        log.warn("Request failed with status code {}: {}".format(
             response.status_code, response.text.encode('utf8')))
 
         return None
@@ -59,7 +97,7 @@ def get_crowd_indicator():
 
 # Extract from payload: {"level":11,"success":true}
 # => 11
-def extract_crowd_level(crowd_indicator):
+def extract_crowd_level_from_api(crowd_indicator):
     return str(
         crowd_indicator['level'])
 
@@ -86,9 +124,9 @@ def current_millis_time():
 
 def is_after_opening_time():
     now = datetime.now()
-    today7am = now.replace(hour=7, minute=0, second=0, microsecond=0)
+    today5am = now.replace(hour=5, minute=0, second=0, microsecond=0)
 
-    is_after = today7am < now
+    is_after = today5am < now
 
     log.debug("Is after opening time: " + str(is_after))
     return is_after
@@ -113,14 +151,14 @@ def handler(event, context):
     log.info("Start checking crowd level")
 
     if is_within_opening_hours():
-        crowd_indicator = get_crowd_indicator()
-        log.debug("Fetched crowd indicator of {} at {}: {}".format(BOULDER_URL, time.ctime(), crowd_indicator))
+        log.debug("It is within the opening hours")
+        crowd_level = get_crowd_indicator()
+        log.debug("Fetched crowd indicator of {} at {}: {}".format(BOULDER_URL, time.ctime(), crowd_level))
 
-        if not crowd_indicator:
+        if not crowd_level:
             log.error("No crowd indicator available")
             raise ValueError('No crowd indicator available')
 
-        crowd_level = extract_crowd_level(crowd_indicator)
     else:
         log.debug("It is outside of the opening hours")
         crowd_level = str(0)

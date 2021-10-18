@@ -35,6 +35,7 @@ def get_url():
 @tracer.capture_method
 def get_crowd_indicator():
     response = requests.request("GET", get_url())
+    log.debug("Request completed")
 
     if response.ok:
         log.debug("Fetched raw crowd indicator succesful: {}".format(
@@ -77,9 +78,9 @@ def current_millis_time():
 
 def is_after_opening_time():
     now = datetime.now()
-    today7am = now.replace(hour=7, minute=0, second=0, microsecond=0)
+    today5am = now.replace(hour=5, minute=0, second=0, microsecond=0)
 
-    is_after = today7am < now
+    is_after = today5am < now
 
     log.debug("Is after opening time: " + str(is_after))
     return is_after
@@ -104,6 +105,7 @@ def handler(event, context):
     log.info("Start checking crowd level")
 
     if is_within_opening_hours():
+        log.debug("It is within the opening hours")
         crowd_indicator = get_crowd_indicator()
         log.debug("Fetched crowd indicator of {} at {}: {}".format(
             BOULDER_URL, time.ctime(), crowd_indicator))
