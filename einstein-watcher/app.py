@@ -38,13 +38,11 @@ def get_crowd_indicator():
     log.debug("Request completed")
 
     if response.ok:
-        log.debug("Fetched raw crowd indicator succesful: {}".format(
-            response.text.encode('utf8')))
+        log.debug(f"Fetched raw crowd indicator succesful: {response.text.encode('utf8')}")
         return response.text
 
     else:
-        log.error("Request failed with status code {}: {}".format(
-            response.status_code, response.text.encode('utf8')))
+        log.error("Request failed with status code {response.status_code}: {response.text.encode('utf8')}")
 
         return None
 
@@ -82,7 +80,7 @@ def is_after_opening_time():
 
     is_after = today5am < now
 
-    log.debug("Is after opening time: " + str(is_after))
+    log.debug(f"Is after opening time: {is_after}")
     return is_after
 
 
@@ -92,7 +90,7 @@ def is_before_closing_time():
 
     is_before = today10pm > now
 
-    log.debug("Is before closing time: " + str(is_before))
+    log.debug(f"Is before closing time: {is_before}")
     return is_before
 
 
@@ -107,8 +105,7 @@ def handler(event, context):
     if is_within_opening_hours():
         log.debug("It is within the opening hours")
         crowd_indicator = get_crowd_indicator()
-        log.debug("Fetched crowd indicator of {} at {}: {}".format(
-            BOULDER_URL, time.ctime(), crowd_indicator))
+        log.debug(f"Fetched crowd indicator of {BOULDER_URL} at {time.ctime()}: {crowd_indicator}")
 
 
         crowd_level = extract_crowd_level(crowd_indicator)
@@ -116,7 +113,7 @@ def handler(event, context):
         log.debug("It is outside of the opening hours")
         crowd_level = str(0)
 
-    log.info("Current crowd level: {}".format(crowd_level))
+    log.info(f"Current crowd level: {crowd_level}")
 
     store_crowd_level(crowd_level)
     log.debug("Persisted crowd level")
