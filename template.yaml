@@ -20,6 +20,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Policies: AmazonTimestreamFullAccess
+      ReservedConcurrentExecutions: 1
       Events:
         TriggerBoulderWeltOstEveryMinute:
           Type: ScheduleV2
@@ -36,6 +37,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Policies: AmazonTimestreamFullAccess
+      ReservedConcurrentExecutions: 1
       Events:
         TriggerBoulderWeltSuedEveryMinute:
           Type: ScheduleV2
@@ -52,6 +54,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Policies: AmazonTimestreamFullAccess
+      ReservedConcurrentExecutions: 1
       Events:
         TriggerBoulderWeltWestEveryMinute:
           Type: ScheduleV2
@@ -70,6 +73,7 @@ Resources:
       Policies: AmazonTimestreamFullAccess
       CodeUri: einstein-watcher/
       Handler: app.handler
+      ReservedConcurrentExecutions: 1
       Events:
         TriggerBoulderWeltEinsteinMinute:
           Type: ScheduleV2
