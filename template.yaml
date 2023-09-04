@@ -32,6 +32,8 @@ Resources:
           BOULDER_URL: https://www.boulderwelt-muenchen-ost.de/
           LOCATION: 'muenchen-ost'
           TABLE_NAME: !Ref BoulderWatcherTimestreamTable
+          POWERTOOLS_METRICS_NAMESPACE: BoulderWatcher
+          POWERTOOLS_SERVICE_NAME: 'muenchen-ost'
 
   BoulderWeltSuedWatcherFunction:
     Type: AWS::Serverless::Function
@@ -49,6 +51,8 @@ Resources:
           BOULDER_URL: https://www.boulderwelt-muenchen-sued.de/
           LOCATION: 'muenchen-sued'
           TABLE_NAME: !Ref BoulderWatcherTimestreamTable
+          POWERTOOLS_METRICS_NAMESPACE: BoulderWatcher
+          POWERTOOLS_SERVICE_NAME: 'muenchen-sued'
 
   BoulderWeltWestWatcherFunction:
     Type: AWS::Serverless::Function
@@ -66,6 +70,8 @@ Resources:
           BOULDER_URL: https://www.boulderwelt-muenchen-west.de/
           LOCATION: 'muenchen-west'
           TABLE_NAME: !Ref BoulderWatcherTimestreamTable
+          POWERTOOLS_METRICS_NAMESPACE: BoulderWatcher
+          POWERTOOLS_SERVICE_NAME: 'muenchen-west'
 
   EinsteinMuenchenWatcherFunction:
     Type: AWS::Serverless::Function
@@ -86,6 +92,8 @@ Resources:
           LOCATION: 'muenchen-einstein'
           TABLE_NAME: !Ref BoulderWatcherTimestreamTable
           JWT_TOKEN: eyJhbGciOiJIUzI1NiIsICJ0eXAiOiJKV1QifQ.eyJjdXN0b21lciI6IkVpbnN0ZWluTSJ9.uH9xRoVykz5fzofHc-JGigeHreaeTayel49o3FR6cNA
+          POWERTOOLS_METRICS_NAMESPACE: BoulderWatcher
+          POWERTOOLS_SERVICE_NAME: 'muenchen-einstein'
 
   BoulderWatcherTimestreamDatabase:
     Type: AWS::Timestream::Database

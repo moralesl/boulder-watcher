@@ -6,10 +6,13 @@ import requests
 from datetime import datetime
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools import Tracer
+from aws_lambda_powertools import Metrics
+from aws_lambda_powertools.metrics import MetricUnit
 
 
 log = Logger(service=os.environ['LOCATION'], sample_rate=1, level='DEBUG')
 tracer = Tracer(service='boulder-watcher')
+metrics = Metrics()
 
 timestream = boto3.client('timestream-write')
 
@@ -97,22 +100,32 @@ def is_within_opening_hours():
     return is_after_opening_time() and is_before_closing_time()
 
 
+@metrics.log_metrics
 @tracer.capture_lambda_handler
 def handler(event, context):
     log.info("Start checking crowd level")
 
     if is_within_opening_hours():
+        metrics.add_metric(name="WithinOpeningHours", unit=MetricUnit.Percent, value=1)
         log.debug("It is within the opening hours")
         crowd_indicator = get_crowd_indicator()
         log.debug(f"Fetched crowd indicator of {BOULDER_URL} at {time.ctime()}: {crowd_indicator}")
 
-
         crowd_level = extract_crowd_level(crowd_indicator)
+
+        if not crowd_level:
+            metrics.add_metric(name="ErrorFetchCrowdIndicator", unit=MetricUnit.Count, value=1)
+            log.error("No crowd indicator available")
+            raise ValueError('No crowd indicator available')
+
     else:
+        metrics.add_metric(name="WithinOpeningHours", unit=MetricUnit.Percent, value=0)
         log.debug("It is outside of the opening hours")
         crowd_level = str(0)
 
-    log.info(f"Current crowd level: {crowd_level}")
+    metrics.add_metric(name="SuccessfulFetchCrowdIndicator", unit=MetricUnit.Count, value=1)
+    metrics.add_metric(name="CrowdLevel", unit=MetricUnit.Percent, value=float(crowd_level))
 
+    log.info(f"Current crowd level: {crowd_level}")
     store_crowd_level(crowd_level)
     log.debug("Persisted crowd level")
