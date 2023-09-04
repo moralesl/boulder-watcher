@@ -8,19 +8,25 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
         "type": "dashboard"
       }
     ]
   },
   "editable": true,
-  "gnetId": null,
+  "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 1,
   "links": [],
+  "liveNow": false,
   "panels": [
     {
       "collapsed": false,
-      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -33,7 +39,6 @@
       "type": "row"
     },
     {
-      "datasource": null,
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -78,37 +83,64 @@
         "showThresholdMarkers": true,
         "text": {}
       },
-      "pluginVersion": "8.0.5",
+      "pluginVersion": "8.4.7",
       "targets": [
         {
+          "database": "\"BoulderWatcher\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "PDsDyVV7z"
+          },
+          "measure": "crowd_lvl",
           "queryType": "raw",
           "rawQuery": "SELECT measure_value::double as \"München Süd\" FROM $__database.$__table\n  WHERE time between ago(5m) and now()\n  and location = 'muenchen-sued'\n  LIMIT 1",
-          "refId": "München Süd"
+          "refId": "München Süd",
+          "table": "\"BoulderCrowdLevel\""
         },
         {
+          "database": "\"BoulderWatcher\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "PDsDyVV7z"
+          },
           "hide": false,
+          "measure": "crowd_lvl",
           "queryType": "raw",
           "rawQuery": "SELECT measure_value::double as \"München West\" FROM $__database.$__table\n  WHERE time between ago(5m) and now()\n  and location = 'muenchen-west'\n  LIMIT 1",
-          "refId": "München West"
+          "refId": "München West",
+          "table": "\"BoulderCrowdLevel\""
         },
         {
+          "database": "\"BoulderWatcher\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "PDsDyVV7z"
+          },
           "hide": false,
+          "measure": "crowd_lvl",
           "queryType": "raw",
           "rawQuery": "SELECT measure_value::double as \"München Ost\" FROM $__database.$__table\n  WHERE time between ago(5m) and now()\n  and location = 'muenchen-ost'\n  LIMIT 1",
-          "refId": "München Ost"
+          "refId": "München Ost",
+          "table": "\"BoulderCrowdLevel\""
         },
         {
+          "database": "\"BoulderWatcher\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "PDsDyVV7z"
+          },
           "hide": false,
+          "measure": "crowd_lvl",
           "queryType": "raw",
           "rawQuery": "SELECT measure_value::double as \"München Einstein\" FROM $__database.$__table\n  WHERE time between ago(5m) and now()\n  and location = 'muenchen-einstein'\n  LIMIT 1",
-          "refId": "München Einstein"
+          "refId": "München Einstein",
+          "table": "\"BoulderCrowdLevel\""
         }
       ],
       "title": "Auslastung",
       "type": "gauge"
     },
     {
-      "datasource": null,
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -171,7 +203,6 @@
       "type": "marcusolsson-hourly-heatmap-panel"
     },
     {
-      "datasource": null,
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -234,7 +265,6 @@
       "type": "marcusolsson-hourly-heatmap-panel"
     },
     {
-      "datasource": null,
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -297,7 +327,6 @@
       "type": "marcusolsson-hourly-heatmap-panel"
     },
     {
-      "datasource": null,
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -360,7 +389,6 @@
       "type": "marcusolsson-hourly-heatmap-panel"
     },
     {
-      "datasource": null,
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -398,7 +426,6 @@
             }
           },
           "mappings": [],
-          "max": 100,
           "min": 0,
           "thresholds": {
             "mode": "absolute",
@@ -412,22 +439,10 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "percent"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "crowd_lvl muenchen-sued"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "München Süd"
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 13,
@@ -443,40 +458,69 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
         {
+          "database": "\"BoulderWatcher\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "PDsDyVV7z"
+          },
+          "measure": "crowd_lvl",
           "queryType": "raw",
-          "rawQuery": "SELECT \n  bin(time, 1h) as binned_timestamp,\n  avg(measure_value::double) as crowd_lvl\nFROM $__database.$__table\n  WHERE $__timeFilter\n  and measure_name = '$__measure'\n  and location = 'muenchen-sued'\ngroup by bin(time, 1h)\norder by binned_timestamp asc\n",
-          "refId": "München Süd"
+          "rawQuery": "SELECT \n  bin(time, 1h) as binned_timestamp,\n  avg(measure_value::double) as \"München Süd\",\n  location\nFROM $__database.$__table\n  WHERE $__timeFilter\n  and measure_name = '$__measure'\n  and location = 'muenchen-sued'\ngroup by bin(time, 1h), location\norder by binned_timestamp asc\n",
+          "refId": "München Süd",
+          "table": "\"BoulderCrowdLevel\""
         },
         {
+          "database": "\"BoulderWatcher\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "PDsDyVV7z"
+          },
           "hide": false,
+          "measure": "crowd_lvl",
           "queryType": "raw",
-          "rawQuery": "SELECT \n  bin(time, 1h) as binned_timestamp,\n  avg(measure_value::double) as crowd_lvl\nFROM $__database.$__table\n  WHERE $__timeFilter\n  and measure_name = '$__measure'\n  and location = 'muenchen-west'\ngroup by bin(time, 1h)\norder by binned_timestamp asc\n",
-          "refId": "München West"
+          "rawQuery": "SELECT \n  bin(time, 1h) as binned_timestamp,\n  avg(measure_value::double) as \"München West\",\n  location\nFROM $__database.$__table\n  WHERE $__timeFilter\n  and measure_name = '$__measure'\n  and location = 'muenchen-west'\ngroup by bin(time, 1h), location\norder by binned_timestamp asc\n",
+          "refId": "München West",
+          "table": "\"BoulderCrowdLevel\""
         },
         {
+          "database": "\"BoulderWatcher\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "PDsDyVV7z"
+          },
           "hide": false,
+          "measure": "crowd_lvl",
           "queryType": "raw",
-          "rawQuery": "SELECT \n  bin(time, 1h) as binned_timestamp,\n  avg(measure_value::double) as crowd_lvl\nFROM $__database.$__table\n  WHERE $__timeFilter\n  and measure_name = '$__measure'\n  and location = 'muenchen-ost'\ngroup by bin(time, 1h)\norder by binned_timestamp asc\n",
-          "refId": "München Ost"
+          "rawQuery": "SELECT \n  bin(time, 1h) as binned_timestamp,\n  avg(measure_value::double) as \"München Ost\",\n  location\nFROM $__database.$__table\n  WHERE $__timeFilter\n  and measure_name = '$__measure'\n  and location = 'muenchen-ost'\ngroup by bin(time, 1h), location\norder by binned_timestamp asc\n",
+          "refId": "München Ost",
+          "table": "\"BoulderCrowdLevel\""
         },
         {
+          "database": "\"BoulderWatcher\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "PDsDyVV7z"
+          },
           "hide": false,
+          "measure": "crowd_lvl",
           "queryType": "raw",
-          "rawQuery": "SELECT \n  bin(time, 1h) as binned_timestamp,\n  avg(measure_value::double) as crowd_lvl\nFROM $__database.$__table\n  WHERE $__timeFilter\n  and measure_name = '$__measure'\n  and location = 'muenchen-einstein'\ngroup by bin(time, 1h)\norder by binned_timestamp asc\n",
-          "refId": "München Einstein"
+          "rawQuery": "SELECT \n  bin(time, 1h) as binned_timestamp,\n  avg(measure_value::double) as \"München Einstein\",\n  location\nFROM $__database.$__table\n  WHERE $__timeFilter\n  and measure_name = '$__measure'\n  and location = 'muenchen-einstein'\ngroup by bin(time, 1h), location\norder by binned_timestamp asc\n",
+          "refId": "München Einstein",
+          "table": "\"BoulderCrowdLevel\""
         }
       ],
       "title": "Crowd-level of the last 7 days",
       "type": "timeseries"
     }
   ],
-  "refresh": "",
-  "schemaVersion": 30,
+  "refresh": "15m",
+  "schemaVersion": 35,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -490,5 +534,6 @@
   "timezone": "",
   "title": "Weekly Crowd_level",
   "uid": "9Z90wV4nk",
-  "version": 6
+  "version": 10,
+  "weekStart": ""
 }
