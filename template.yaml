@@ -21,10 +21,11 @@ Resources:
     Properties:
       Policies: AmazonTimestreamFullAccess
       Events:
-        TriggerEveryMinute:
-          Type: Schedule
+        TriggerBoulderWeltOstEveryMinute:
+          Type: ScheduleV2
           Properties:
-            Schedule: rate(1 minute)
+            ScheduleExpression: rate(1 minute)
+            Name: TriggerBoulderWeltOstEveryMinute
       Environment:
         Variables:
           BOULDER_URL: https://www.boulderwelt-muenchen-ost.de/
@@ -36,10 +37,11 @@ Resources:
     Properties:
       Policies: AmazonTimestreamFullAccess
       Events:
-        TriggerEveryMinute:
-          Type: Schedule
+        TriggerBoulderWeltSuedEveryMinute:
+          Type: ScheduleV2
           Properties:
-            Schedule: rate(1 minute)
+            ScheduleExpression: rate(1 minute)
+            Name: TriggerBoulderWeltSuedEveryMinute
       Environment:
         Variables:
           BOULDER_URL: https://www.boulderwelt-muenchen-sued.de/
@@ -51,10 +53,11 @@ Resources:
     Properties:
       Policies: AmazonTimestreamFullAccess
       Events:
-        TriggerEveryMinute:
-          Type: Schedule
+        TriggerBoulderWeltWestEveryMinute:
+          Type: ScheduleV2
           Properties:
-            Schedule: rate(1 minute)
+            ScheduleExpression: rate(1 minute)
+            Name: TriggerBoulderWeltWestEveryMinute
       Environment:
         Variables:
           BOULDER_URL: https://www.boulderwelt-muenchen-west.de/
@@ -68,10 +71,11 @@ Resources:
       CodeUri: einstein-watcher/
       Handler: app.handler
       Events:
-        TriggerEveryMinute:
-          Type: Schedule
+        TriggerBoulderWeltEinsteinMinute:
+          Type: ScheduleV2
           Properties:
-            Schedule: rate(1 minute)
+            ScheduleExpression: rate(1 minute)
+            Name: TriggerBoulderWeltEinsteinMinute
       Environment:
         Variables:
           BOULDER_URL: https://muenchen.einstein-boulder.com/
