@@ -2,9 +2,9 @@ import os
 import re
 import boto3
 import time
-import requests
 import json
 from datetime import datetime
+from urllib import request
 from pyquery import PyQuery as pq
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools import Tracer
@@ -70,26 +70,34 @@ def extract_crowd_level_from_html(html_body):
 
 @tracer.capture_method
 def fetch_crowd_indicator_from_api():
-    response = requests.request("POST", get_url(), data=PAYLOAD)
-    log.debug("Request completed")
+    try:
+        request = request.Request(get_url, data=PAYLOAD, method="POST")
+        response = request.urlopen(request)
+        response_text = response.read().decode('utf8')
 
-    if response.ok:
-        log.debug(f"Fetched crowd indicator succesful: {response.text.encode('utf8')}")
+        log.debug("Request completed")
 
-        payload = json.loads(response.text.encode('utf8'))
+        if response.status == 200:
+            log.debug(f"Fetched crowd indicator successful: {response_text}")
 
-        if payload['success']:
-            log.debug("Request has been succesful")
+            payload = json.loads(response_text)
 
-            return payload
+            if payload['success']:
+                log.debug("Request has been successful")
+
+                return payload
+            else:
+                log.warning(f"Request hasn't been successful: {payload}")
+
+                return None
+
         else:
-            log.warn(f"Request hasn't been succesful: {payload}")
+            log.warning(f"Request failed with status code {response.status}: {response_text}")
 
             return None
 
-    else:
-        log.warn(f"Request failed with status code {response.status_code}: {response.text.encode('utf8')}")
-
+    except Exception as e:
+        log.error(f"An error occurred during the request: {e}")
         return None
 
 
