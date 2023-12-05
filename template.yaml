@@ -8,11 +8,11 @@ Globals:
     Handler: app.handler
     Runtime: python3.11
     Architectures:
-    - x86_64
+    - x86_64    # Not available for ARM as lxml has to be recompiled
     AutoPublishAlias: live
     Tracing: Active
     Layers:
-    - arn:aws:lambda:eu-west-1:420927334919:layer:aws-lambda-powertools-python-layer:3
+    - arn:aws:lambda:eu-west-1:017000801446:layer:AWSLambdaPowertoolsPythonV2:51
 
 
 Resources:
